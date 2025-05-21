@@ -1,11 +1,10 @@
 import express, { Request, Response } from "express";
-import employeeRouter from "./employee_router";
+import employeeRouter from "./routes/employee.route";
 import loggerMiddleware from "./loggerMiddleware";
 import { processTimeMiddleware } from "./processTimeMiddleware";
-import datasource from "./data-source";
+import datasource from "./db/data-source";
 
 
-const {Client} = require('pg');
 
 const server = express();
 server.use(express.json());
