@@ -1,10 +1,14 @@
 import EmployeeService from "../services/employee.service";
 import EmployeeRepository from "../repositories/employee.repository";
-import {Request,Response,Router} from "express"
+import {Request,Response,Router,NextFunction} from "express"
+import HttpException from "../exception/httpException";
+import { isEmail } from "../validators/emailValidator";
+import { CreateEmployeeDto } from "../dto/createEmployee.dto";
+import { CreateAddressDto } from "../dto/createAddress.dto";
+import { plainToInstance } from "class-transformer";
+import { validate } from "class-validator";
 
-
-
-class EmployeeContoller{
+class EmployeeController{
     constructor(private employeeService:EmployeeService, router:Router){
         router.post('/',this.createEmployee.bind(this))
         router.get('/',this.getAllEmployees.bind(this))
@@ -13,11 +17,24 @@ class EmployeeContoller{
         router.delete('/:id',this.deleteEmployee)
     }
 
-    async createEmployee(req:Request,res:Response){
-        const name=req.body.name
-        const email=req.body.email
-        const savedEmp=await this.employeeService.createEmployee(name,email)
-        res.status(201).send(savedEmp)
+    async createEmployee(req:Request,res:Response,next:NextFunction){
+          try {
+      const createEmployeeDto = plainToInstance(CreateEmployeeDto, req.body);
+      const errors = await validate(createEmployeeDto);
+      if (errors.length > 0) {
+        console.log(JSON.stringify(errors));
+        throw new HttpException(400,JSON.stringify(errors))
+      }
+      const savedEmployee = await this.employeeService.createEmployee(
+        createEmployeeDto.email,
+        createEmployeeDto.name,
+        createEmployeeDto.age,
+        createEmployeeDto.address
+      );
+      res.status(201).send(savedEmployee);
+    } catch (error) {
+      next(error);
+    }
     }
 
     async getAllEmployees(req:Request,res:Response){
@@ -25,10 +42,22 @@ class EmployeeContoller{
         res.status(200).send(employees)
     }
 
-    async getEmployeeById(req:Request,res:Response){
-        const id=Number(req.params.id)
+    async getEmployeeById(req:Request,res:Response,next:NextFunction){
+        try{
+           const id=Number(req.params.id)
         const employee=await this.employeeService.getEmployeeById(id);
+        if(!employee){
+            throw new HttpException(404,"")
+            
+        }
         res.status(200).send(employee)
+        }
+        catch(err){
+            console.log(err);
+            next(err)
+        }
+        
+    
 
     }
 
@@ -48,4 +77,9 @@ class EmployeeContoller{
     }
 }
 
-export default EmployeeContoller
+
+function fn1(){
+    console.log("hiii")
+}
+
+export default EmployeeController
