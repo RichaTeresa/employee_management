@@ -91,6 +91,7 @@ export interface CrashSensor {
      */
 
     deployAirbag(): AirbagResult {
+      
 
       if (this.sensor.isCrashDetected()) {
 
@@ -103,7 +104,7 @@ export interface CrashSensor {
         return { triggered: true, force, timing };
 
       }
-
+      
       return { triggered: false };
 
     }

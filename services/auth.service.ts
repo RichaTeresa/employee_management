@@ -4,9 +4,13 @@ import EmployeeService from "./employee.service";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { JWT_SECRET, JWT_VALIDITY } from "../utils/constraints";
+import { LoggerService } from "./logger.service";
 
 export class AuthService{
-    constructor(private employeeService:EmployeeService){}
+    private logger: LoggerService;
+    constructor(private employeeService:EmployeeService){
+        this.logger = LoggerService.getInstance(AuthService.name)
+    }
 
     async login(email:string,password:string){
         const employee=await this.employeeService.getEmployeeByEmail(email)
@@ -25,7 +29,7 @@ export class AuthService{
             email:employee.email,
             role:employee.role
         }
-       console.log(payload)
+       this.logger.info(payload)
         const token=jwt.sign(payload,JWT_SECRET,{expiresIn:JWT_VALIDITY})
         return {
             tokenType:"Bearer",

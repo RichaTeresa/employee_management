@@ -9,14 +9,22 @@ import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import { UpdateEmployeeDto } from "../dto/updateEmployee.dto";
 import {  checkRole } from "../middlewares/authorization.middleware";
+import { EmployeeRole } from "../entities/employee.entity";
+import { DepartmentRepository } from "../repositories/department.repository";
+import Department from "../entities/department.entity";
 
 class EmployeeController {
+
+  
   constructor(private employeeService: EmployeeService, router: Router) {
-    router.post("/",checkRole("HR"), this.createEmployee.bind(this));
+
+
+    const authRoles=[EmployeeRole.HR,EmployeeRole.DEVELOPER,EmployeeRole.UI,EmployeeRole.UX]
+    router.post("/",checkRole(authRoles),this.createEmployee.bind(this));
     router.get("/", this.getAllEmployees.bind(this));
     router.get("/:id", this.getEmployeeById.bind(this));
-    router.put("/:id",checkRole("DEVELOPER"), this.updateEmployee);
-    router.delete("/:id",checkRole("DEVELOPER"), this.deleteEmployee);
+    router.put("/:id",checkRole(authRoles), this.updateEmployee);
+    router.delete("/:id",checkRole(authRoles), this.deleteEmployee);
   }
 
   async createEmployee(req: Request, res: Response, next: NextFunction) {
@@ -28,12 +36,17 @@ class EmployeeController {
         throw new HttpException(400, JSON.stringify(errors));
       }
       const savedEmployee = await this.employeeService.createEmployee(
+        createEmployeeDto.employeeId,
+        createEmployeeDto.dateOfJoining,
+        createEmployeeDto.status,
+        createEmployeeDto.experience,
         createEmployeeDto.name,
         createEmployeeDto.email,
         createEmployeeDto.age,
         createEmployeeDto.role,
         createEmployeeDto.address,
-        createEmployeeDto.password
+        createEmployeeDto.password,
+        createEmployeeDto.deptId
       );
       res.status(201).send(savedEmployee);
     } catch (error) {
@@ -61,11 +74,6 @@ class EmployeeController {
   }
 
   updateEmployee = async (req: Request, res: Response, next: NextFunction) => {
-    // const id=Number(req.params.id)
-    // const name=req.body.name
-    // const email=req.body.email
-    // await this.employeeService.updateEmployee(id,name,email);
-    // res.status(200).send()
     try {
       const id = Number(req.params.id);
       if (isNaN(id)) {
@@ -73,20 +81,25 @@ class EmployeeController {
       }
       const updateEmployeeDto = plainToInstance(UpdateEmployeeDto, req.body);
       console.log("updated")
-      const errors = await validate(UpdateEmployeeDto);
+      const errors = await validate(updateEmployeeDto);
       if (errors.length > 0) {
         console.log(JSON.stringify(errors));
         throw new HttpException(400, errors as unknown as string);
       }
       const updatedEmployee = await this.employeeService.updateEmployee(
         id,
-        updateEmployeeDto.email,
+        updateEmployeeDto.employeeId,
+        updateEmployeeDto.dateOfJoining,
+        updateEmployeeDto.status,
+        updateEmployeeDto.experience,
         updateEmployeeDto.name,
+        updateEmployeeDto.email,
         updateEmployeeDto.age,
         updateEmployeeDto.address,
-        updateEmployeeDto.password
+        updateEmployeeDto.password,
+        updateEmployeeDto.deptId
       );
-      
+
       res.status(200).send(updatedEmployee);
     } catch (error) {
       next(error);

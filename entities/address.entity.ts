@@ -12,9 +12,17 @@ class Address extends AbstractEntity{
     @Column()
     pincode:string;
 
-    @OneToOne(()=>Employee,(employee) => employee.address)
-    employee:Employee;
+    @OneToOne(() => Employee, (employee) => employee.address, {
+     onDelete: 'CASCADE'
+    })
+    @JoinColumn()
+    employee: Employee;
+    
+    @Column()
+    houseNo:string;
 
+    @Column()
+    line2:string;
 }
 
 export default Address

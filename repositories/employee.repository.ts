@@ -34,7 +34,9 @@ class EmployeeRepository{
    }
 
    async update(id:number,employee:Employee) :Promise<void>{
-    await this.repository.save({id,...employee})
+      const emp = {id,...employee};
+      console.log(emp)
+    await this.repository.save(emp)
    }
 
    async delete(employee:Employee):Promise<void>{
