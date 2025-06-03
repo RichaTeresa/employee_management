@@ -33,6 +33,7 @@ class EmployeeRepository{
     });
    }
 
+
    async update(id:number,employee:Employee) :Promise<void>{
       const emp = {id,...employee};
       console.log(emp)
@@ -40,7 +41,7 @@ class EmployeeRepository{
    }
 
    async delete(employee:Employee):Promise<void>{
-    await this.repository.remove(employee)
+    await this.repository.softRemove(employee)
    }
 }
 

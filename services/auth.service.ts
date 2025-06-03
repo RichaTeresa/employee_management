@@ -21,6 +21,7 @@ export class AuthService{
         const isPasswordValid=await bcrypt.compare(password,employee.password)
 
         if (!isPasswordValid){
+            console.log("invalid password",password,employee.password)
             throw new HttpException(400,"invalid password")
         }
 

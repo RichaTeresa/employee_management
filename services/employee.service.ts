@@ -63,12 +63,13 @@ class EmployeeService{
         
     }
 
-    async updateEmployee(id:number,employee_id:string,joiningDate:Date,status:EmployeeStatus,experience:number,name:string,email:string,age:number,address:CreateAddressDto,password:string,deptId:number) {
+    async updateEmployee(id:number,employee_id:string,joiningDate:Date,status:EmployeeStatus,role:EmployeeRole,experience:number,name:string,email:string,age:number,address:CreateAddressDto,password:string,deptId:number) {
         const existingEmployee=await this.employeeRepository.findOneById(id);
         if(existingEmployee){
             existingEmployee.employeeId=employee_id;
             existingEmployee.dateOfJoining=joiningDate;
             existingEmployee.status=status;
+            existingEmployee.role=role;
             existingEmployee.experience=experience
             existingEmployee.name=name;
             existingEmployee.email=email;

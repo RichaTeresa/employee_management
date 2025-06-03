@@ -91,6 +91,7 @@ class EmployeeController {
         updateEmployeeDto.employeeId,
         updateEmployeeDto.dateOfJoining,
         updateEmployeeDto.status,
+        updateEmployeeDto.role,
         updateEmployeeDto.experience,
         updateEmployeeDto.name,
         updateEmployeeDto.email,
